@@ -251,7 +251,7 @@ if user_input := st.chat_input(current_config["input_placeholder"]):
 
     with st.chat_message("user"):
         st.write(user_input)
-        st.session_state.message.append(HumanMessage(content=user_input))
+        st.session_state.messages.append(HumanMessage(content=user_input))
 
     with st.chat_message("assistant"):
         with st.spinner(current_config["spinner"]):
