@@ -9,7 +9,7 @@ os.environ["MISTRAL_API_KEY"] = "GsoCCPZTCzSgOxV3Jx7pCN94g9hVxdJh"
 hide_streamlit_badge = """ 
 <style> 
 #MainMenu {visibility: hidden;}
- #footer {visibility: hidden;} 
+ footer {visibility: hidden;} 
  #header {visibility: hidden;}
 .stDeployButton {display:none;}
  div[data-testid="stStatusWidget"] {visibility: hidden;} 
