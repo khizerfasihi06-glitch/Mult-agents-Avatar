@@ -10,7 +10,7 @@ hide_streamlit_badge = """
 <style> 
 #MainMenu {visibility: hidden;}
  #footer {visibility: hidden;} 
-# #header {visibility: hidden;}
+ #header {visibility: hidden;}
 .stDeployButton {display:none;}
  div[data-testid="stStatusWidget"] {visibility: hidden;} 
  </style> """ 
