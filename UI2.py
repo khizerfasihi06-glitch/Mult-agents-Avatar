@@ -6,6 +6,7 @@ st.image("Image.png", width=150)
 st.set_page_config(page_title="Multi-personal AI Chatbot", layout="centered")
 os.environ["MISTRAL_API_KEY"] = "GsoCCPZTCzSgOxV3Jx7pCN94g9hVxdJh"
 
+hide_streamlit_badge = """ <style> /* Streamlit branding/badge aur floating elements hide karne ke liye */ #MainMenu {visibility: hidden;} footer {visibility: hidden;} header {visibility: hidden;} .stDeployButton {display:none;} div[data-testid="stStatusWidget"] {visibility: hidden;} </style> """ st.markdown(hide_streamlit_badge, unsafe_allow_html=True)
 
 @st.cache_resource
 def get_model():
