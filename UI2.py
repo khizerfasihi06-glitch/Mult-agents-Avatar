@@ -13,6 +13,7 @@ hide_streamlit_badge = """
  #header {visibility: hidden;}
 .stDeployButton {display:none;}
  div[data-testid="stStatusWidget"] {visibility: hidden;} 
+ .viewerBadge_container__1QSob {display: none;}
  </style> """ 
 st.markdown(hide_streamlit_badge, unsafe_allow_html=True)
 
