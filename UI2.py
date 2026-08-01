@@ -2,8 +2,7 @@ import os
 import streamlit as st
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_mistralai import ChatMistralAI
-import io
-from pypdf import PdfReader
+
 
 # --- Page Configuration ---
 st.set_page_config(page_title="Multi-persona AI Chatbot", layout="centered")
