@@ -5,6 +5,11 @@ import streamlit as st
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_mistralai import ChatMistralAI
 
+# ⚠️ LOCAL TESTING ONLY — never commit a real key here or push this line to git.
+# Replace the placeholder below with your actual Mistral API key, or better,
+# delete this line and use .streamlit/secrets.toml / a real env var instead.
+os.environ["MISTRAL_API_KEY"] = "your-actual-key-here"
+
 # Optional dependencies used only for extracting text from uploaded files.
 # The app still runs (uploader just supports fewer formats) if these are missing.
 try:
@@ -64,9 +69,14 @@ if IMAGE_PATH.exists():
 # ===========================
 # NEVER hardcode API keys in source code. Put your key in
 # .streamlit/secrets.toml as:
-#   MISTRAL_API_KEY = "your-key-here"
+#   MISTRAL_API_KEY = "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"
 # or set it as a real environment variable before running the app.
-mistral_key = st.secrets.get("MISTRAL_API_KEY", os.environ.get("MISTRAL_API_KEY", ""))
+try:
+    mistral_key = st.secrets["MISTRAL_API_KEY"]
+except Exception:
+    # WARNING: hardcoding a key here is fine for quick local testing ONLY.
+    # Never commit a real key to git — use secrets.toml or an env var instead.
+    mistral_key = os.environ.get("MISTRAL_API_KEY", "")
 
 if not mistral_key:
     st.error(
@@ -163,6 +173,20 @@ if uploaded_file is not None:
         )
     if document_context:
         st.sidebar.success(f"Loaded {uploaded_file.name} ({len(document_context)} chars)")
+
+st.sidebar.markdown("---")
+st.sidebar.title("Response Length")
+response_length = st.sidebar.select_slider(
+    "How long should replies be?",
+    options=["Short", "Medium", "Long"],
+    value="Medium",
+)
+
+RESPONSE_LENGTH_INSTRUCTIONS = {
+    "Short": "Keep every reply brief: 1-3 sentences, no unnecessary elaboration.",
+    "Medium": "Keep replies moderate in length: a focused paragraph or two, covering the key points without padding.",
+    "Long": "Give thorough, detailed replies: fully explain reasoning, cover edge cases, and use examples where useful.",
+}
 
 # ===========================
 # Download Chat History
@@ -475,6 +499,7 @@ current_config = PERSONA_CONFIGS[persona]
 # Build the final system prompt AFTER current_config exists,
 # and after document_context has been defined (from the uploader above).
 final_system_prompt = current_config["system_prompt"]
+final_system_prompt += f"\n\n{RESPONSE_LENGTH_INSTRUCTIONS[response_length]}"
 if document_context:
     final_system_prompt += f"""
 
@@ -487,9 +512,11 @@ if (
     "current_persona" not in st.session_state
     or st.session_state.current_persona != persona
     or st.session_state.get("current_document_id") != uploaded_file_id
+    or st.session_state.get("current_response_length") != response_length
 ):
     st.session_state.current_persona = persona
     st.session_state.current_document_id = uploaded_file_id
+    st.session_state.current_response_length = response_length
     st.session_state.messages = [SystemMessage(content=final_system_prompt)]
 
 st.title(current_config["title"])
