@@ -3,3 +3,4 @@ langchain-core
 langchain-mistralai
 pypdf
 python-docx
+io
