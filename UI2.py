@@ -8,7 +8,7 @@ from langchain_mistralai import ChatMistralAI
 # ⚠️ LOCAL TESTING ONLY — never commit a real key here or push this line to git.
 # Replace the placeholder below with your actual Mistral API key, or better,
 # delete this line and use .streamlit/secrets.toml / a real env var instead.
-os.environ["MISTRAL_API_KEY"] = "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"
+os.environ["MISTRAL_API_KEY"] = "sVFi6wAR03FkE7hAGClnCo920v8jGHu1"
 
 # Optional dependencies used only for extracting text from uploaded files.
 # The app still runs (uploader just supports fewer formats) if these are missing.
