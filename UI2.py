@@ -5,6 +5,48 @@ import streamlit as st
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_mistralai import ChatMistralAI
 
+# Optional dependencies used only for extracting text from uploaded files.
+# The app still runs (uploader just supports fewer formats) if these are missing.
+try:
+    from pypdf import PdfReader
+except ImportError:
+    PdfReader = None
+
+try:
+    import docx as docx_lib
+except ImportError:
+    docx_lib = None
+
+MAX_CONTEXT_CHARS = 12000  # keep the injected document from blowing up the prompt
+
+
+def extract_text_from_upload(uploaded_file) -> str:
+    """Best-effort text extraction from an uploaded .txt/.pdf/.docx file."""
+    name = uploaded_file.name.lower()
+    try:
+        if name.endswith(".txt") or name.endswith(".md"):
+            return uploaded_file.read().decode("utf-8", errors="ignore")
+
+        if name.endswith(".pdf"):
+            if PdfReader is None:
+                st.sidebar.warning("Install `pypdf` to read PDF files (`pip install pypdf`).")
+                return ""
+            reader = PdfReader(uploaded_file)
+            return "\n".join(page.extract_text() or "" for page in reader.pages)
+
+        if name.endswith(".docx"):
+            if docx_lib is None:
+                st.sidebar.warning("Install `python-docx` to read .docx files (`pip install python-docx`).")
+                return ""
+            document = docx_lib.Document(uploaded_file)
+            return "\n".join(p.text for p in document.paragraphs)
+
+        st.sidebar.warning(f"Unsupported file type: {uploaded_file.name}")
+        return ""
+    except Exception as exc:
+        st.sidebar.error(f"Couldn't read {uploaded_file.name}: {exc}")
+        return ""
+
 # ===========================
 # Page config (MUST be the first Streamlit command)
 # ===========================
@@ -102,7 +144,25 @@ persona = st.sidebar.selectbox(
     ],
 )
 
+st.sidebar.markdown("---")
+st.sidebar.title("Attach a Document")
+uploaded_file = st.sidebar.file_uploader(
+    "Give the AI extra context (.txt, .pdf, .docx)",
+    type=["txt", "md", "pdf", "docx"],
+)
+
 document_context = ""
+uploaded_file_id = None
+if uploaded_file is not None:
+    uploaded_file_id = f"{uploaded_file.name}:{uploaded_file.size}"
+    document_context = extract_text_from_upload(uploaded_file)
+    if len(document_context) > MAX_CONTEXT_CHARS:
+        document_context = (
+            document_context[:MAX_CONTEXT_CHARS]
+            + "\n...[truncated, document too long to include in full]"
+        )
+    if document_context:
+        st.sidebar.success(f"Loaded {uploaded_file.name} ({len(document_context)} chars)")
 
 # ===========================
 # Download Chat History
@@ -426,8 +486,10 @@ if document_context:
 if (
     "current_persona" not in st.session_state
     or st.session_state.current_persona != persona
+    or st.session_state.get("current_document_id") != uploaded_file_id
 ):
     st.session_state.current_persona = persona
+    st.session_state.current_document_id = uploaded_file_id
     st.session_state.messages = [SystemMessage(content=final_system_prompt)]
 
 st.title(current_config["title"])
