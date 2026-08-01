@@ -1,3 +1,5 @@
-streamlit>=1.35.0
-langchain-core>=0.2.0
-langchain-mistralai>=0.1.5
+streamlit
+langchain-core
+langchain-mistralai
+pypdf
+python-docx
