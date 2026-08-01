@@ -73,22 +73,28 @@ persona = st.sidebar.selectbox(
 )
 
 
+# ===========================
+# Download Chat History
+# ===========================
+
 st.sidebar.markdown("---")
-st.sidebar.title("Paper / Document")
+st.sidebar.title("Download Chat")
 
-uploaded_file = st.sidebar.file_uploader(
-    "Upload a text document or paper context:",
-    type=["txt", "pdf", "py", "csv", "json"]
+chat_history = ""
 
+if "messages" in st.session_state:
+    for msg in st.session_state.messages:
+        if isinstance(msg, HumanMessage):
+            chat_history += f"User:\n{msg.content}\n\n"
+        elif isinstance(msg, AIMessage):
+            chat_history += f"Assistant:\n{msg.content}\n\n"
+
+st.sidebar.download_button(
+    label="📥 Download Chat History",
+    data=chat_history,
+    file_name="chat_history.txt",
+    mime="text/plain",
 )
-document_context = ""
-if uploaded_file is not None:
-    try:
-        string = uploaded_file.getvalue().decode("utf-8")
-        document_context = string
-        st.sidebar.success(f'loaded:{uploaded_file.name} ({len(document_context)} charactor)')
-    except Exception as e:
-        st.sidebar.error("Error reading File.")
 
 
 PERSONA_CONFIGS = {
