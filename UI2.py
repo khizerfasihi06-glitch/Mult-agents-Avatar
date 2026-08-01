@@ -50,7 +50,7 @@ st.markdown(hide_streamlit_badge, unsafe_allow_html=True)
 
 @st.cache_resource
 def get_model():
-    return ChatMistralAI(model="mistral-small-2506", temperature=0.9)
+    return ChatMistralAI(model="mistral-small-2506", temperature=0.6)
 
 
 model = get_model()
