@@ -240,7 +240,7 @@ PERSONA_CONFIGS = {
 
 current_config = PERSONA_CONFIGS[persona]
 
-final_system_prompt = current_config["system_prompt"]
+
 
 if document_context:
     final_system_prompt += f"""
@@ -248,13 +248,17 @@ if document_context:
 {document_context}
 [END OF CONTEXT DOCUMENT]
 """
-if ("current_persona" not in st.session_state or st.session_state.current_persona != persona):
-     st.session_state.current_persona = persona
-    st.session_state.last_doc_name =  uploaded_file.name if uploaded_file else None
+ 
+final_system_prompt = current_config["system_prompt"]
+
+if (
+    "current_persona" not in st.session_state
+    or st.session_state.current_persona != persona
+):
+    st.session_state.current_persona = persona
     st.session_state.messages = [
         SystemMessage(content=final_system_prompt)
     ]
-
 st.title(current_config['title'])
 st.subheader(current_config["subtitle"])
 if st.sidebar.button("Clear Chat History"):
