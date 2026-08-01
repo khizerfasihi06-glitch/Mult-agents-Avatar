@@ -3,12 +3,12 @@ from pathlib import Path
 
 import streamlit as st
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
-from langchain_mistralai import ChatMistralAI
+from langchain_groq import ChatGroq
 
 # ⚠️ LOCAL TESTING ONLY — never commit a real key here or push this line to git.
-# Replace the placeholder below with your actual Mistral API key, or better,
-# delete this line and use .streamlit/secrets.toml / a real env var instead.
-os.environ["MISTRAL_API_KEY"] = "sVFi6wAR03FkE7hAGClnCo920v8jGHu1"
+# This key is exposed (shared in chat) — revoke/regenerate it in the Groq console
+# (console.groq.com) as soon as you're done testing.
+os.environ["GROQ_API_KEY"] = "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"
 
 # Optional dependencies used only for extracting text from uploaded files.
 # The app still runs (uploader just supports fewer formats) if these are missing.
@@ -69,23 +69,21 @@ if IMAGE_PATH.exists():
 # ===========================
 # NEVER hardcode API keys in source code. Put your key in
 # .streamlit/secrets.toml as:
-#   MISTRAL_API_KEY = "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"
+#   MISTRAL_API_KEY = "your-key-here"
 # or set it as a real environment variable before running the app.
 try:
-    mistral_key = st.secrets["MISTRAL_API_KEY"]
+    groq_key = st.secrets["GROQ_API_KEY"]
 except Exception:
-    # WARNING: hardcoding a key here is fine for quick local testing ONLY.
-    # Never commit a real key to git — use secrets.toml or an env var instead.
-    mistral_key = os.environ.get("MISTRAL_API_KEY", "")
+    groq_key = os.environ.get("GROQ_API_KEY", "")
 
-if not mistral_key:
+if not groq_key:
     st.error(
-        "No Mistral API key found. Add MISTRAL_API_KEY to .streamlit/secrets.toml "
+        "No Groq API key found. Add GROQ_API_KEY to .streamlit/secrets.toml "
         "or set it as an environment variable before running the app."
     )
     st.stop()
 
-os.environ["MISTRAL_API_KEY"] = mistral_key
+os.environ["GROQ_API_KEY"] = groq_key
 
 hide_streamlit_badge = """
 <style>
@@ -102,7 +100,7 @@ st.markdown(hide_streamlit_badge, unsafe_allow_html=True)
 
 @st.cache_resource
 def get_model():
-    return ChatMistralAI(model="mistral-small-2506", temperature=0.4)
+    return ChatGroq(model="llama-3.3-70b-versatile", temperature=0.4)
 
 
 model = get_model()
