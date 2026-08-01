@@ -25,7 +25,7 @@ except Exception:
 # --- Model Initialization ---
 @st.cache_resource
 def get_model():
-    return ChatMistralAI(model="mistral-small-2506", temperature=0.9)
+    return ChatMistralAI(model="mistral-small-2506", temperature=0.4)
 
 model = get_model()
 
