@@ -5,15 +5,25 @@ import streamlit as st
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_mistralai import ChatMistralAI
 
-
+# ===========================
+# Page config (MUST be the first Streamlit command)
+# ===========================
 st.set_page_config(page_title="Multi-personal AI Chatbot", layout="centered")
 
-
+# ===========================
+# Logo image (safe, won't crash if missing)
+# ===========================
 IMAGE_PATH = Path(__file__).parent / "Image.png"
 if IMAGE_PATH.exists():
     st.image(str(IMAGE_PATH), width=150)
 
-
+# ===========================
+# API key handling
+# ===========================
+# NEVER hardcode API keys in source code. Put your key in
+# .streamlit/secrets.toml as:
+#   MISTRAL_API_KEY = "your-key-here"
+# or set it as a real environment variable before running the app.
 mistral_key = st.secrets.get("MISTRAL_API_KEY", os.environ.get("MISTRAL_API_KEY", ""))
 
 if not mistral_key:
@@ -92,23 +102,11 @@ persona = st.sidebar.selectbox(
     ],
 )
 
-
-st.sidebar.markdown("---")
-st.sidebar.title("Context Document (optional)")
-
-uploaded_doc = st.sidebar.file_uploader(
-    "Upload a .txt file to give the AI extra context",
-    type=["txt"],
-)
-
 document_context = ""
-if uploaded_doc is not None:
-    try:
-        document_context = uploaded_doc.read().decode("utf-8", errors="ignore")
-    except Exception:
-        st.sidebar.warning("Could not read that file as text.")
 
-
+# ===========================
+# Download Chat History
+# ===========================
 st.sidebar.markdown("---")
 st.sidebar.title("Download Chat")
 
@@ -414,7 +412,8 @@ PERSONA_CONFIGS = {
 
 current_config = PERSONA_CONFIGS[persona]
 
-
+# Build the final system prompt AFTER current_config exists,
+# and after document_context has been defined (from the uploader above).
 final_system_prompt = current_config["system_prompt"]
 if document_context:
     final_system_prompt += f"""
